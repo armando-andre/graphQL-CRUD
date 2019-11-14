@@ -1,39 +1,34 @@
 const { GraphQLServer } = require('graphql-yoga');
 
-const typeDefs = `
-type Query {
-  info: String!
-  feed: [Link!]!
-}
-
-type Link {
-  id: ID!
-  description: String!
-  url: String!
-}
-`
-
 let links = [{
-  id: 'link-0',
+  id: 932342,
   url: 'www.howtographql.com',
   description: 'Fullstack tutorial for GraphQL'
 }]
 
+let idCount = links.length
+
 const resolvers = {
   Query: {
-    info: () =>  `This is the API of a Hackernews Clone`,
+    info: () => "This is the API of a Hackernews Clone",
     feed: () => links
   },
 
-  Link: {
-    id: (parent) => parent.id,
-    description: (parent) => parent.description,
-    url: (parent) => parent.url
-  }
+  Mutation: {
+    post: (parent, args) => {
+      const link = {
+        id: `link-${idCount++}`,
+        description: args.description,
+        url: args.url
+      }
+      links.push(link)
+      return link
+    }
+  },
 }
 
 const server = new GraphQLServer({
-  typeDefs,
+  typeDefs: './schema.graphql',
   resolvers,
-})
-server.start(() => console.log(`Server is running on http://localhost:4000`))
+});
+server.start(() => console.log(`Server is running  on http://localhost:4000`));
